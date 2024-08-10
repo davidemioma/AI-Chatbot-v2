@@ -1,4 +1,7 @@
+import { redis } from "@/lib/redis";
+import { ragChat } from "@/lib/rag-chat";
 import { reconstructURL } from "@/lib/utils";
+import ChatWrapper from "@/components/ChatWrapper";
 
 type Props = {
   params: {
@@ -6,10 +9,23 @@ type Props = {
   };
 };
 
-export default function URLPage({ params: { url } }: Props) {
+export default async function URLPage({ params: { url } }: Props) {
   const contructedUrl = reconstructURL(url as string[]);
 
-  console.log(contructedUrl);
+  const isIndexed = await redis.sismember("indexed-urls", contructedUrl);
 
-  return <div>URLPage {contructedUrl}</div>;
+  if (!isIndexed) {
+    await ragChat.context.add({
+      type: "html",
+      source: contructedUrl,
+      config: {
+        chunkOverlap: 50,
+        chunkSize: 200,
+      },
+    });
+
+    await redis.sadd("indexed-urls", contructedUrl);
+  }
+
+  return <ChatWrapper sessionId="xnnnsjjwjswjsksk-ddd" />;
 }
