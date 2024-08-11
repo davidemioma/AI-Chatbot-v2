@@ -3,22 +3,31 @@
 import React from "react";
 import Messages from "./Messages";
 import { useChat } from "ai/react";
-import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Send, Loader2 } from "lucide-react";
+import { type Message as TMessage } from "ai/react";
+import { Textarea } from "@/components/ui/textarea";
 
 type Props = {
   sessionId: string;
+  initialMessages: TMessage[];
 };
 
-const ChatWrapper = ({ sessionId }: Props) => {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } =
-    useChat({
-      api: "/api/chat",
-      body: {
-        sessionId,
-      },
-    });
+const ChatWrapper = ({ sessionId, initialMessages }: Props) => {
+  const {
+    messages,
+    input,
+    setInput,
+    handleInputChange,
+    handleSubmit,
+    isLoading,
+  } = useChat({
+    api: "/api/chat",
+    body: {
+      sessionId,
+    },
+    initialMessages,
+  });
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -28,20 +37,30 @@ const ChatWrapper = ({ sessionId }: Props) => {
 
   return (
     <div className="relative bg-zinc-900 min-h-screen flex flex-col divide-y divide-zinc-700">
-      <div className="flex-1 bg-zinc-800 flex flex-col text-black">
+      <div className="flex-1 bg-zinc-800 flex flex-col text-white">
         <Messages messages={messages} />
       </div>
 
       <form
         onSubmit={onSubmit}
-        className="w-full flex items-center gap-3 h-16 px-5"
+        className="w-full flex items-center gap-3 h-32 px-5"
       >
-        <Input
-          className=""
+        <Textarea
+          className="bg-zinc-800 rounded-xl text-white border-0"
           value={input}
+          rows={4}
           placeholder={isLoading ? "Generating. . ." : "Ask something. . ."}
           disabled={isLoading}
           onChange={handleInputChange}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+
+              handleSubmit();
+
+              setInput("");
+            }
+          }}
         />
 
         <Button
