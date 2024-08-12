@@ -1,9 +1,10 @@
 "use client";
 
 import React, { ElementRef, useEffect, useRef } from "react";
+import Link from "next/link";
 import Message from "./Message";
-import { MessageSquare } from "lucide-react";
 import { type Message as TMessage } from "ai/react";
+import { ArrowLeft, MessageSquare } from "lucide-react";
 
 type Props = {
   messages: TMessage[];
@@ -18,6 +19,16 @@ const Messages = ({ messages }: Props) => {
 
   return (
     <div className="h-[calc(100vh-8rem)] w-full overflow-y-auto flex flex-col">
+      <div className="w-full border-b border-zinc-500 p-5">
+        <Link
+          href="/"
+          type="submit"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0842A0]"
+        >
+          <ArrowLeft className="h-5 w-5 flex-shrink-0" />
+        </Link>
+      </div>
+
       {messages.length > 0 ? (
         messages.map((message, i) => <Message key={i} message={message} />)
       ) : (
