@@ -20,7 +20,6 @@ export default async function URLPage({ params: { url } }: Props) {
   const isIndexed = await redis.sismember("indexed-urls", contructedUrl);
 
   const initialMessages = await ragChat.history.getMessages({
-    amount: 10,
     sessionId,
   });
 
